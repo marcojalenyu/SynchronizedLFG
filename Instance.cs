@@ -6,7 +6,6 @@ class Instance
     public bool active { get; private set; }
     public uint totalPartiesServed { get; private set; }
     public uint totalTimeServed { get; private set; }
-    private static readonly object lockObject = new object();
 
     public Instance(uint id)
     {
