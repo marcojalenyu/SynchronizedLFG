@@ -26,7 +26,7 @@ class Config
     // Thread-safe singleton constructors
     private Config() 
     { 
-        ExtractConfig();
+        this.ExtractConfig();
     }
 
     public static Config Instance
@@ -60,15 +60,37 @@ class Config
                 throw new FileNotFoundException();
             }
 
-            Console.WriteLine("Hi");
+            
         }
         catch (FileNotFoundException ex)
         {
             Console.WriteLine("Config file not found. Please create a config.txt file in the root directory.");
+            this.SetDefaultConfig();
         }
         catch (Exception ex)
         {
             Console.WriteLine("An error occurred while reading the config file.");
+            this.SetDefaultConfig();
         }
+    }
+
+    /**
+     * Set default values for the configuration:
+     * maxInstances = 3
+     * numTanks     = 10
+     * numHealers   = 10
+     * numDPS       = 10
+     * minTimeFinish = 5
+     * maxTimeFinish = 15
+     */
+    private void SetDefaultConfig()
+    {
+        Console.WriteLine("Setting default configurations.");
+        this.maxInstances = 3;
+        this.numTanks = 10;
+        this.numHealers = 10;
+        this.numDPS = 10;
+        this.minTimeFinish = 5;
+        this.maxTimeFinish = 15;
     }
 }
