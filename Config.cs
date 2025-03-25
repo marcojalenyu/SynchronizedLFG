@@ -17,12 +17,12 @@ class Config
     private static readonly object padlock = new object();
 
     // Configurations
-    private uint maxInstances;
-    private uint numTanks;
-    private uint numHealers;
-    private uint numDPS;
-    private uint minTimeFinish;
-    private uint maxTimeFinish;
+    public uint maxInstances;
+    public uint numTanks;
+    public uint numHealers;
+    public uint numDPS;
+    public uint minTimeFinish;
+    public uint maxTimeFinish;
 
     // To track which needs to be set
     private readonly Dictionary<string, bool> keysSet = new Dictionary<string, bool>
@@ -115,7 +115,6 @@ class Config
      */
     private void SetConfig(string[] lines)
     {
-        Console.WriteLine("Setting configurations from config.txt");
         foreach (string line in lines)
         {
             string[] parts = line.Split(' ');
