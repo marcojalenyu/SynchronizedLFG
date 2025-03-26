@@ -1,4 +1,8 @@
-﻿/**
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+
+/**
  *  This class holds the specifications for LFG queueing based on config.txt:
  *  maxInstances    (n) - maximum number of concurrent instances
  *  numTanks        (t) - number of tank players in the queue

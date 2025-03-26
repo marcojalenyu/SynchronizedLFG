@@ -9,7 +9,7 @@ Things to consider:
 2. A standard party of 5 is 1 tank, 1 healer, 3 DPS.
 3. It is expected to not encounter any deadlock or starvation.
 4. Inputs are assumed to arrive at the same time.
-5. The clear time of a dungeon is randomly set between t1 and t2 (where 0 < t1 <= t2 < 15)
+5. The clear time of a dungeon is randomly set between t1 and t2.
 
 The following configurations can be set in the 'config.txt' file located in the same folder with the following format:
 - n [maximum number of concurrent instances]
@@ -18,6 +18,8 @@ The following configurations can be set in the 'config.txt' file located in the 
 - d [number of DPS players in the queue]
 - t1 [minimum time before an instance is finished]
 - t2 [maximum time before an instance is finished]
+
+Note: All values must be a non-negative integer (while t1 and t2 must follow this: 0 < t1 <= t2 <= 15).
 
 Example 'config.txt':
 ```
