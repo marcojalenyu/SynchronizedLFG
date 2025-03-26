@@ -111,7 +111,7 @@ class Config
 
     /**
      * Set the configurations based on the values extracted from config.txt
-     * Note: All values have to be a uint, and t1 <= t2 <= 15
+     * Note: All values have to be a uint, and 0 < t1 <= t2 <= 15
      */
     private void SetConfig(string[] lines)
     {
@@ -163,7 +163,17 @@ class Config
             }
         }
 
-        // To ensure t1 <= t2 <= 15
+        // To ensure 0 < t1 <= t2 <= 15
+        if (this.minTimeFinish == 0)
+        {
+            Console.WriteLine("Error: t1 = 0, setting t1 = 1.");
+            this.minTimeFinish = 1;
+        }
+        if (this.maxTimeFinish == 0)
+        {
+            Console.WriteLine("Error: t2 = 0, setting t2 = 1.");
+            this.maxTimeFinish = 1;
+        }
         if (this.maxTimeFinish > 15)
         {
             Console.WriteLine("Error: t2 > 15, setting t2 = 15.");

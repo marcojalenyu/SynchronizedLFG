@@ -22,11 +22,10 @@ class Instance
 
     public void Run(Party party, uint clearTime)
     {
-        Console.WriteLine($"Starting Instance {this.id} with party {party.id}");
+        // Console.WriteLine($"Starting Instance {this.id} with party {party.id}");
         Thread.Sleep((int)clearTime * 1000);
 
-
-        Console.WriteLine($"Instance {this.id} - {party.id} for {clearTime} s");
+        // Console.WriteLine($"Instance {this.id} - {party.id} for {clearTime} s");
         totalPartiesServed++;
         totalTimeServed += clearTime;
         this.active = false;
