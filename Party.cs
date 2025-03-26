@@ -6,7 +6,7 @@
  */
 class Party
 {
-    public readonly uint id;
+    public uint id { get; private set; }
 
     public Party(uint id)
     {
