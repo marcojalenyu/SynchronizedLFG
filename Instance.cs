@@ -2,7 +2,7 @@
 
 class Instance
 {
-    public readonly uint id;
+    public uint id { get; private set; }
     public bool active { get; private set; }
     public uint totalPartiesServed { get; private set; }
     public uint totalTimeServed { get; private set; }
@@ -13,19 +13,22 @@ class Instance
         this.active = false;
         this.totalPartiesServed = 0;
         this.totalTimeServed = 0;
-
     }
 
-    public void Run(Party party, uint time)
+    public void Activate()
     {
         this.active = true;
-        // Console.WriteLine($"Instance {id} is serving party {party.id} for {time} seconds.");
-        Thread.Sleep((int)time * 1000);
+    }
 
+    public void Run(Party party, uint clearTime)
+    {
+        Console.WriteLine($"Starting Instance {this.id} with party {party.id}");
+        Thread.Sleep((int)clearTime * 1000);
+
+
+        Console.WriteLine($"Instance {this.id} - {party.id} for {clearTime} s");
+        totalPartiesServed++;
+        totalTimeServed += clearTime;
         this.active = false;
-        this.totalPartiesServed++;
-        this.totalTimeServed += time;
-        
-        Console.WriteLine($"Instance {id} has finished serving party {party.id} for {time} seconds.");
     }
 }
