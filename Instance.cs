@@ -36,6 +36,7 @@ class Instance
      * Runs the instance with a party for a given clear time
      * party     - the party that is clearing the instance
      * clearTime - the time it takes for the party to clear the instance
+     * (party is only called for debugging purposes and readability)
      */
     public void Run(Party party, uint clearTime)
     {

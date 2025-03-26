@@ -1,6 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
+/**
+ * This class runs the LFG system with synchronized threads 
+ */
 namespace SynchronizedLFG
 {
     class Program
@@ -14,6 +20,9 @@ namespace SynchronizedLFG
         private static object printLock = new object();
         private static AutoResetEvent statusChangedEvent = new AutoResetEvent(false);
 
+        /**
+         * Main method
+         */
         static void Main(string[] args)
         {
             Config config = Config.Instance;
@@ -21,6 +30,7 @@ namespace SynchronizedLFG
             SetInstances(config.maxInstances);
             SetParties(config);
 
+            // Semaphore to limit the number of instances running concurrently
             semaphore = new SemaphoreSlim((int)config.maxInstances);
 
             Thread statusThread = new Thread(StatusWorker);
@@ -45,6 +55,12 @@ namespace SynchronizedLFG
             config.PrintRemainingPlayers();
         }
 
+        /**
+         * Worker thread for each instance:
+         * It will wait for an instance to be available, then run the instance with a party
+         * Semaphores are used to limit the number of instances running concurrently
+         * Locks are used to ensure thread safety when accessing the party queue
+         */
         private static void InstanceWorker()
         {
             while (true)
@@ -84,6 +100,7 @@ namespace SynchronizedLFG
                 if (instance != null)
                 {
                     uint clearTime = (uint)random.Next((int)Config.Instance.minTimeFinish, (int)Config.Instance.maxTimeFinish);
+                    // To signal that the status has changed (to trigger status printing)
                     statusChangedEvent.Set();
                     instance.Run(party, clearTime);
                     statusChangedEvent.Set();
@@ -93,6 +110,10 @@ namespace SynchronizedLFG
             }
         }
 
+        /**
+         * Print the status of all instances when the statusChangedEvent is set
+         * (i.e. when a party is added to the queue or an instance is cleared)
+         */
         private static void StatusWorker()
         {
             while (true)
@@ -107,7 +128,9 @@ namespace SynchronizedLFG
             }
         }
 
-        // Create instances based on the maxInstances
+        /**
+         * Create instances based on the max number of instances
+         */
         private static void SetInstances(uint maxInstances)
         {
             for (uint i = 0; i < maxInstances; i++)
@@ -116,14 +139,16 @@ namespace SynchronizedLFG
             }
         }
 
-        // Create parties based on the number of tanks, healers, and DPS
+        /**
+         * Create parties based on the number of tanks, healers, and DPS
+         * Each party has 1 tank, 1 healer, and 3 DPS
+         */
         private static void SetParties(Config config)
         {
             uint partyId = 0;
             uint t = config.numTanks;
             uint h = config.numHealers;
             uint d = config.numDPS;
-            // Each party has 1 tank, 1 healer, and 3 DPS
             while (t >= 1 && h >= 1 && d >= 3)
             {
                 Party newParty = new Party(partyId);
@@ -136,6 +161,9 @@ namespace SynchronizedLFG
             config.UpdatePlayers(t, h, d);
         }
 
+        /**
+         * Get the first available instance that is not currently active
+         */
         private static Instance? GetAvailableInstance()
         {
             foreach (var instance in instances)
@@ -149,7 +177,7 @@ namespace SynchronizedLFG
         }
 
         /**
-         * Print current status of all available instances
+         * Print current status of all available instances:
          * - if there is a party in the instance, the status should say "active"
          * - if the instance is empty, the status should say "empty"
          */
@@ -166,7 +194,9 @@ namespace SynchronizedLFG
             }
         }
 
-        // Print the summary of each instance
+        /**
+         * Print the summary of all instances after all possible parties have been served
+         */
         private static void PrintSummary()
         {
             Console.WriteLine("\nSummary:");
