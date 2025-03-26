@@ -36,8 +36,8 @@ class Config
     };
 
     // Thread-safe singleton constructors
-    private Config() 
-    { 
+    private Config()
+    {
         this.Initialize();
     }
 
@@ -76,7 +76,7 @@ class Config
                 string[] lines = File.ReadAllLines(configFilePath);
                 this.SetConfig(lines);
             }
-            
+
         }
         catch (FileNotFoundException ex)
         {
@@ -118,7 +118,7 @@ class Config
         foreach (string line in lines)
         {
             string[] parts = line.Split(' ');
-            
+
             // To only allow 2 parts (key and value) and to ensure value is a number
             if (parts.Length != 2 || !uint.TryParse(parts[1], out uint value))
             {
@@ -177,5 +177,26 @@ class Config
 
         // To set default values for keys that were not set
         this.SetDefaultConfig();
+    }
+
+    /**
+     * Update the number of players in the queue after matchmaking
+     */
+    public void UpdatePlayers(uint t, uint h, uint d)
+    {
+        this.numTanks = t;
+        this.numHealers = h;
+        this.numDPS = d;
+    }
+
+    /**
+     * Print the player count
+     */
+    public void PrintRemainingPlayers()
+    {
+        Console.WriteLine("\nRemaining Players:");
+        Console.WriteLine($"Tanks: {this.numTanks}");
+        Console.WriteLine($"Healers: {this.numHealers}");
+        Console.WriteLine($"DPS: {this.numDPS}");
     }
 }
