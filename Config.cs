@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-/**
+﻿/**
  *  This class holds the specifications for LFG queueing based on config.txt:
  *  maxInstances    (n) - maximum number of concurrent instances
  *  numTanks        (t) - number of tank players in the queue
@@ -13,7 +10,7 @@ using System.IO;
 class Config
 {
     // Thread-safe singleton (Source: https://csharpindepth.com/articles/Singleton)
-    private static Config instance = null;
+    private static Config? instance = null;
     private static readonly object padlock = new object();
 
     // Configurations
@@ -63,7 +60,7 @@ class Config
     {
         try
         {
-            // Get the file path of config.txt
+            // To access config.txt
             string projectRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.Split("bin")[0]);
             string configFilePath = Path.Combine(projectRoot, "config.txt");
 
@@ -75,18 +72,20 @@ class Config
             {
                 string[] lines = File.ReadAllLines(configFilePath);
                 this.SetConfig(lines);
+                this.ValidateTimeValues();
+                this.SetInvalidToDefault();
             }
 
         }
-        catch (FileNotFoundException ex)
+        catch (FileNotFoundException)
         {
             Console.WriteLine("Config file not found. Setting default values.");
-            this.SetDefaultConfig();
+            this.SetInvalidToDefault();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Console.WriteLine("Error occurred. Setting default values.");
-            this.SetDefaultConfig();
+            this.SetInvalidToDefault();
         }
     }
 
@@ -99,7 +98,7 @@ class Config
      * minTimeFinish = 5
      * maxTimeFinish = 15
      */
-    private void SetDefaultConfig()
+    private void SetInvalidToDefault()
     {
         if (!keysSet["n"]) this.maxInstances = 3;
         if (!keysSet["t"]) this.numTanks = 10;
@@ -162,8 +161,13 @@ class Config
                     break;
             }
         }
+    }
 
-        // To ensure 0 < t1 <= t2 <= 15
+    /**
+     * Validate time values (t1 and t2) to ensure 0 < t1 <= t2 <= 15
+     */
+    private void ValidateTimeValues()
+    {
         if (this.minTimeFinish == 0)
         {
             Console.WriteLine("Error: t1 = 0, setting t1 = 1.");
@@ -184,9 +188,6 @@ class Config
             Console.WriteLine("Error: t1 > t2, setting t1 = t2");
             this.minTimeFinish = this.maxTimeFinish;
         }
-
-        // To set default values for keys that were not set
-        this.SetDefaultConfig();
     }
 
     /**
