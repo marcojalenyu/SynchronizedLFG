@@ -15,7 +15,7 @@ namespace SynchronizedLFG
         private static List<Thread> instanceThreads = new List<Thread>();
         private static Queue<Party> partyQueue = new Queue<Party>();
         private static Random random = new Random();
-        private static SemaphoreSlim semaphore;
+        private static SemaphoreSlim? semaphore;
         private static object queueLock = new object();
         private static object printLock = new object();
         private static AutoResetEvent statusChangedEvent = new AutoResetEvent(false);
