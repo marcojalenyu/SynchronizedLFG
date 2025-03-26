@@ -17,12 +17,12 @@ class Config
     private static readonly object padlock = new object();
 
     // Configurations
-    public uint maxInstances;
-    public uint numTanks;
-    public uint numHealers;
-    public uint numDPS;
-    public uint minTimeFinish;
-    public uint maxTimeFinish;
+    public uint maxInstances { get; private set; }
+    public uint numTanks { get; private set; }
+    public uint numHealers { get; private set; }
+    public uint numDPS { get; private set; }
+    public uint minTimeFinish { get; private set; }
+    public uint maxTimeFinish { get; private set; }
 
     // To track which needs to be set
     private readonly Dictionary<string, bool> keysSet = new Dictionary<string, bool>
