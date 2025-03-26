@@ -9,72 +9,54 @@ namespace SynchronizedLFG
         private static Queue<Party> partyQueue = new Queue<Party>();
         private static Random random = new Random();
         private static readonly object lockObject = new object();
+        private static SemaphoreSlim semaphore;
         static void Main(string[] args)
         {
             Config config = Config.Instance;
 
-            for (uint i = 0; i < config.maxInstances; i++)
+            SetInstances(config.maxInstances);
+            SetParties(config);
+
+            PrintSummary();
+            config.PrintRemainingPlayers();
+        }
+
+        // Create instances based on the maxInstances
+        private static void SetInstances(uint maxInstances)
+        {
+            for (uint i = 0; i < maxInstances; i++)
             {
                 instances.Add(new Instance(i));
             }
+        }
 
+        // Create parties based on the number of tanks, healers, and DPS
+        private static void SetParties(Config config)
+        {
             uint partyId = 0;
-            // To prevent starvation, there must be at least 1 tank, 1 healer, and 3 DPS in the queue
-            while (config.numTanks >= 1 && config.numHealers >= 1 && config.numDPS >= 3)
+            uint t = config.numTanks;
+            uint h = config.numHealers;
+            uint d = config.numDPS;
+            // Each party has 1 tank, 1 healer, and 3 DPS
+            while (t >= 1 && h >= 1 && d >= 3)
             {
                 Party newParty = new Party(partyId);
                 partyQueue.Enqueue(newParty);
                 partyId++;
-                config.numTanks--;
-                config.numHealers--;
-                config.numDPS -= 3;
+                t--;
+                h--;
+                d -= 3;
             }
-
-            List<Thread> threads = new List<Thread>();
-            Party? party = null; // Initialize party to null
-            while (partyQueue.Count > 0)
-            {
-                Instance? instance = GetNextInactiveInstance();
-                if (instance != null)
-                {
-                    // Console.WriteLine($"Parties left: {partyQueue.Count}");
-                    party = partyQueue.Dequeue();
-
-                    if (party != null)
-                    {
-                        uint time = (uint)random.Next((int)config.minTimeFinish, (int)config.maxTimeFinish);
-                        Thread thread = new Thread(() => instance.Run(party, time));
-                        threads.Add(thread);
-                        thread.Start();
-                    }
-                }
-            }
-
-            foreach (Thread thread in threads)
-            {
-                thread.Join();
-            }
-
-            Console.WriteLine("Summary:");
-            foreach (Instance inst in instances)
-            {
-                Console.WriteLine($"Instance {inst.id} served {inst.totalPartiesServed} parties for a total of {inst.totalTimeServed} seconds.");
-            }
+            config.UpdatePlayers(t, h, d);
         }
 
-        private static Instance? GetNextInactiveInstance()
+        private static void PrintSummary()
         {
-            lock (lockObject)
+            Console.WriteLine("\nSummary:");
+            foreach (var instance in instances)
             {
-                foreach (Instance instance in instances)
-                {
-                    if (!instance.active)
-                    {
-                        return instance;
-                    }
-                }
+                Console.WriteLine($"Instance {instance.id}: {instance.totalPartiesServed} parties, {instance.totalTimeServed} seconds.");
             }
-            return null;
         }
     }
 }
