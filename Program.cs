@@ -15,10 +15,11 @@ namespace SynchronizedLFG
         private static List<Thread> instanceThreads = new List<Thread>();
         private static Queue<Party> partyQueue = new Queue<Party>();
         private static Random random = new Random();
-        private static SemaphoreSlim? semaphore;
+        private static SemaphoreSlim semaphore;
         private static object queueLock = new object();
         private static object printLock = new object();
         private static AutoResetEvent statusChangedEvent = new AutoResetEvent(false);
+        private static uint lastUsedInstance = uint.MaxValue;
 
         /**
          * Main method
@@ -162,15 +163,24 @@ namespace SynchronizedLFG
         }
 
         /**
-         * Get the first available instance that is not currently active
+         * Get the next available instance in a thread-safe and "fairer" manner
+         * Note: (int) typecast is used because indices have to be integers
          */
         private static Instance? GetAvailableInstance()
         {
-            foreach (var instance in instances)
+            lock (instances)
             {
-                if (!instance.active)
+                uint instancesCount = (uint)instances.Count;
+                uint startIndex = (lastUsedInstance == uint.MaxValue) ? 0 : (lastUsedInstance + 1) % instancesCount;
+                for (uint i = 0; i < instances.Count; i++)
                 {
-                    return instance;
+                    // To ensure it will restart from the beginning if no available instance is found
+                    uint index = (startIndex + i) % instancesCount;
+                    if (!instances[(int)index].active)
+                    {
+                        lastUsedInstance = index;
+                        return instances[(int)index];
+                    }
                 }
             }
             return null;
