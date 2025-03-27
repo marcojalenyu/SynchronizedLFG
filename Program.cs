@@ -178,7 +178,7 @@ namespace SynchronizedLFG
          */
         private static void PrintStatuses()
         {
-            // To ensure it only prints once even if multiple threads are calling it
+            // To ensure it only prints the list one at a time
             lock (printLock)
             {
                 Console.WriteLine("\nStatus:");
