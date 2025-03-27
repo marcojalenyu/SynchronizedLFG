@@ -189,7 +189,7 @@ class Config
         }
         if (this.minTimeFinish > this.maxTimeFinish)
         {
-            Console.WriteLine("Error: t1 > t2, setting t1 = t2");
+            Console.WriteLine("Error: t1 > t2, setting t1 = t2.");
             this.minTimeFinish = this.maxTimeFinish;
         }
     }
