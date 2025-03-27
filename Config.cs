@@ -169,7 +169,7 @@ class Config
 
     /**
      * Validate time values (t1 and t2) to ensure 0 < t1 <= t2 <= 15
-     * Validate n to ensure n > 0
+     * Validate n to ensure 0 < n <= 1000
      */
     private void ValidateValueRange()
     {
@@ -178,22 +178,27 @@ class Config
             Console.WriteLine("Error: n = 0, setting n = 3.");
             this.maxInstances = 3;
         }
-        if (this.minTimeFinish == 0)
+        else if (this.maxInstances > 1000)
         {
-            Console.WriteLine("Error: t1 = 0, setting t1 = 1.");
-            this.minTimeFinish = 1;
+            Console.WriteLine("Error: n > 1000, setting n = 1000.");
+            this.maxInstances = 1000;
         }
         if (this.maxTimeFinish == 0)
         {
             Console.WriteLine("Error: t2 = 0, setting t2 = 1.");
             this.maxTimeFinish = 1;
         }
-        if (this.maxTimeFinish > 15)
+        else if (this.maxTimeFinish > 15)
         {
             Console.WriteLine("Error: t2 > 15, setting t2 = 15.");
             this.maxTimeFinish = 15;
         }
-        if (this.minTimeFinish > this.maxTimeFinish)
+        if (this.minTimeFinish == 0)
+        {
+            Console.WriteLine("Error: t1 = 0, setting t1 = 1.");
+            this.minTimeFinish = 1;
+        }
+        else if (this.minTimeFinish > this.maxTimeFinish)
         {
             Console.WriteLine("Error: t1 > t2, setting t1 = t2.");
             this.minTimeFinish = this.maxTimeFinish;

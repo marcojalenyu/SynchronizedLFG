@@ -19,7 +19,7 @@ The following configurations can be set in the 'config.txt' file located in the 
 - t1 [minimum time before an instance is finished]
 - t2 [maximum time before an instance is finished]
 
-Note: All values must be a non-negative integer (uint) (while n > 0 and 0 < t1 <= t2 <= 15).
+Note: All values must be a non-negative integer (uint) (while 0 < n <= 1000 and 0 < t1 <= t2 <= 15).
 
 Example 'config.txt':
 ```
