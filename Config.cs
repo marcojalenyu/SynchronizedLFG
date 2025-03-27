@@ -76,8 +76,8 @@ class Config
             {
                 string[] lines = File.ReadAllLines(configFilePath);
                 this.SetConfig(lines);
-                this.ValidateValueRange();
                 this.SetInvalidToDefault();
+                this.ValidateValueRange();
             }
 
         }
