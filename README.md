@@ -36,6 +36,7 @@ t2 15
 - The ordering of the configurations can be in any order; however, duplicate configurations will be ignored.
 - Any invalid lines (either empty, incorrect format, invalid value, or non-existent configurations) will be ignored.
 - For any invalid configurations, the program will set a default value for the invalid configuration.
+- For time, t1 or t2 = 0 will be set to 1; t1 > t2 will be set to t1 = t2; t2 > 15 will be set to t2 = 15.
 
 ## Running the program
 
