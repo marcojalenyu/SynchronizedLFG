@@ -11,15 +11,17 @@ namespace SynchronizedLFG
 {
     class Program
     {
+        // For the queueing logic
         private static List<Instance> instances = new List<Instance>();
-        private static List<Thread> instanceThreads = new List<Thread>();
         private static Queue<Party> partyQueue = new Queue<Party>();
         private static Random random = new Random();
-        private static SemaphoreSlim semaphore;
+        private static uint lastUsedInstance = uint.MaxValue;
+        // Locks and events to handle thread synchronization
+        private static List<Thread> instanceThreads = new List<Thread>();
         private static object queueLock = new object();
         private static object printLock = new object();
+        private static object instanceLock = new object();
         private static AutoResetEvent statusChangedEvent = new AutoResetEvent(false);
-        private static uint lastUsedInstance = uint.MaxValue;
 
         /**
          * Main method
@@ -27,12 +29,8 @@ namespace SynchronizedLFG
         static void Main(string[] args)
         {
             Config config = Config.Instance;
-
             SetInstances(config.maxInstances);
             SetParties(config);
-
-            // Semaphore to limit the number of instances running concurrently
-            semaphore = new SemaphoreSlim((int)config.maxInstances);
 
             Thread statusThread = new Thread(StatusWorker);
             statusThread.Start();
@@ -59,21 +57,18 @@ namespace SynchronizedLFG
         /**
          * Worker thread for each instance:
          * It will wait for an instance to be available, then run the instance with a party
-         * Semaphores are used to limit the number of instances running concurrently
          * Locks are used to ensure thread safety when accessing the party queue
          */
         private static void InstanceWorker()
         {
             while (true)
             {
-                semaphore.Wait();
-
                 Party party;
+                // To ensure only one party is dequeued at a time
                 lock (queueLock)
                 {
                     if (partyQueue.Count == 0)
                     {
-                        semaphore.Release();
                         break;
                     }
                     party = partyQueue.Dequeue();
@@ -82,32 +77,21 @@ namespace SynchronizedLFG
                 Instance? instance = null;
                 while (instance == null)
                 {
-                    lock (instances)
+                    instance = GetAvailableInstance();
+                    if (instance != null)
                     {
-                        instance = GetAvailableInstance();
-                        if (instance != null)
-                        {
-                            instance.Activate();
-                        }
-                    }
-
-                    if (instance == null)
-                    {
-                        semaphore.Release();
-                        semaphore.Wait();
+                        instance.Activate();
                     }
                 }
 
                 if (instance != null)
                 {
                     uint clearTime = (uint)random.Next((int)Config.Instance.minTimeFinish, (int)Config.Instance.maxTimeFinish);
-                    // To signal that the status has changed (to trigger status printing)
+                    // To signal that the status has changed (and trigger status printing)
                     statusChangedEvent.Set();
                     instance.Run(party, clearTime);
                     statusChangedEvent.Set();
                 }                
-
-                semaphore.Release();
             }
         }
 
@@ -168,7 +152,8 @@ namespace SynchronizedLFG
          */
         private static Instance? GetAvailableInstance()
         {
-            lock (instances)
+            // To ensure threads do not return the same instance
+            lock (instanceLock)
             {
                 uint instancesCount = (uint)instances.Count;
                 uint startIndex = (lastUsedInstance == uint.MaxValue) ? 0 : (lastUsedInstance + 1) % instancesCount;
@@ -193,6 +178,7 @@ namespace SynchronizedLFG
          */
         private static void PrintStatuses()
         {
+            // To ensure it only prints once even if multiple threads are calling it
             lock (printLock)
             {
                 Console.WriteLine("\nStatus:");
