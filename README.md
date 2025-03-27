@@ -19,7 +19,7 @@ The following configurations can be set in the 'config.txt' file located in the 
 - t1 [minimum time before an instance is finished]
 - t2 [maximum time before an instance is finished]
 
-Note: All values must be a non-negative integer (while t1 and t2 must follow this: 0 < t1 <= t2 <= 15).
+Note: All values must be a non-negative integer (uint) (while n > 0 and 0 < t1 <= t2 <= 15).
 
 Example 'config.txt':
 ```
@@ -45,6 +45,8 @@ t2 15
 
 The program has the following functionalities to handle concurrency and synchronization:
 - Threads are used to dispatch players to the dungeon instance and track the statuses of the dungeon instances.
-- Semaphores are used to control the number of concurrent instances at a maximum of n.
 - Locks are used to ensure thread safety (to avoid deadlocks) when accessing shared resources like the party queue and the list of dungeon instances.
-- AutoResetEvent is used to signal the start and completion of a run in a dungeon instance.
+- Starvation is generally avoided by looping from the index of the last instance that a party has been assigned to.
+- AutoResetEvent is used to signal the start and completion of a run in a dungeon instance, allowing for a print of the status of all dungeon instances.
+
+Note: Using a really high amount of instances (n) may cause the console to be flooded with messages and take a while to complete.

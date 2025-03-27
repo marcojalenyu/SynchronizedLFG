@@ -76,7 +76,7 @@ class Config
             {
                 string[] lines = File.ReadAllLines(configFilePath);
                 this.SetConfig(lines);
-                this.ValidateTimeValues();
+                this.ValidateValueRange();
                 this.SetInvalidToDefault();
             }
 
@@ -169,9 +169,15 @@ class Config
 
     /**
      * Validate time values (t1 and t2) to ensure 0 < t1 <= t2 <= 15
+     * Validate n to ensure n > 0
      */
-    private void ValidateTimeValues()
+    private void ValidateValueRange()
     {
+        if (this.maxInstances == 0)
+        {
+            Console.WriteLine("Error: n = 0, setting n = 3.");
+            this.maxInstances = 3;
+        }
         if (this.minTimeFinish == 0)
         {
             Console.WriteLine("Error: t1 = 0, setting t1 = 1.");
